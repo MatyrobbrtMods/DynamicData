@@ -2,6 +2,7 @@ package com.matyrobbrt.dynamicdata;
 
 import com.matyrobbrt.dynamicdata.services.Platform;
 import net.minecraftforge.fml.ModList;
+import net.minecraftforge.fml.loading.FMLLoader;
 import net.minecraftforge.fml.loading.moddiscovery.ModAnnotation;
 import net.minecraftforge.forgespi.language.ModFileScanData;
 import org.objectweb.asm.Type;
@@ -52,5 +53,15 @@ public class ForgePlatform implements Platform {
             });
             return data;
         };
+    }
+
+    @Override
+    public int getModCount() {
+        return ModList.get().size();
+    }
+
+    @Override
+    public boolean isClient() {
+        return FMLLoader.getDist().isClient();
     }
 }

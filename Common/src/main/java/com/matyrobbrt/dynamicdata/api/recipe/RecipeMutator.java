@@ -1,5 +1,7 @@
 package com.matyrobbrt.dynamicdata.api.recipe;
 
+import com.google.gson.JsonObject;
+import com.matyrobbrt.dynamicdata.api.DataMutator;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.Recipe;
@@ -9,9 +11,10 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-public interface RecipeMutator {
+public interface RecipeMutator extends DataMutator {
     void add(Recipe<?> recipe);
     void add(ResourceLocation recipeId, Function<ResourceLocation, Recipe<?>> recipeFunction);
+    void add(ResourceLocation recipeId, JsonObject json);
 
     void removeMatching(Predicate<Recipe<?>> predicate);
     void removeAllOfType(RecipeType<?> recipeType);

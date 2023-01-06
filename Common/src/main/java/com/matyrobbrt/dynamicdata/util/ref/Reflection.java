@@ -1,4 +1,4 @@
-package com.matyrobbrt.dynamicdata.util;
+package com.matyrobbrt.dynamicdata.util.ref;
 
 import sun.misc.Unsafe;
 
@@ -6,6 +6,8 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Field;
+import java.util.Arrays;
+import java.util.List;
 
 public class Reflection {
     public static final Unsafe UNSAFE;
@@ -31,5 +33,24 @@ public class Reflection {
 
     public static MethodHandles.Lookup getLookup(Class<?> target) throws Throwable {
         return (MethodHandles.Lookup) NEW_LOOKUP.invokeExact(target);
+    }
+
+    public static <R, T> FieldHandle<R, T> fieldHandle(Class<R> clazz, String... possibleNames) {
+        final List<String> possible = List.of(possibleNames);
+        final Field field = Arrays.stream(clazz.getDeclaredFields()).filter(it ->
+                possible.contains(it.getName())).findFirst().orElseThrow(() -> new IllegalArgumentException("No field with the name " + Arrays.toString(possibleNames) + " was found in " + clazz));
+        final long offset = UNSAFE.objectFieldOffset(field);
+        return new FieldHandle<>() {
+            @Override
+            @SuppressWarnings("unchecked")
+            public T get(R object) {
+                return (T) UNSAFE.getObject(object, offset);
+            }
+
+            @Override
+            public void set(R object, T value) {
+                UNSAFE.putObject(object, offset, value);
+            }
+        };
     }
 }

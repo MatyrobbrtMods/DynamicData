@@ -20,16 +20,23 @@ dependencies {
 
 loom {
     runs {
+        configureEach {
+            final List classPaths = [
+                    project.tasks.processResources.outputs.files.asPath,
+                    project.sourceSets.main.java.classesDirectory.get().asFile
+            ]
+            // Thanks Fabric...
+            vmArgs("-Dfabric.classPathGroups=${classPaths.join(File.pathSeparator)}")
+            vmArg('-Xmx3G')
+        }
         client {
             client()
             setConfigName("Fabric Client")
-            ideConfigGenerated(true)
             runDir("run")
         }
         server {
             server()
             setConfigName("Fabric Server")
-            ideConfigGenerated(true)
             runDir("run")
         }
     }

@@ -10,6 +10,10 @@ public interface Platform {
     Map<String, Map<String, Object>> findClassesWithAnnotation(Class<? extends Annotation> annotationClass, AnnotationLookup lookup);
     Map<MethodTarget, Map<String, Object>> findMethodsWithAnnotation(Class<? extends Annotation> annotationClass, AnnotationLookup lookup);
 
+    int getModCount();
+
+    boolean isClient();
+
     enum AnnotationLookup {
         EVERYWHERE,
         ONLY_US

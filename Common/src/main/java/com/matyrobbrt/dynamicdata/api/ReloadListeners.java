@@ -1,6 +1,6 @@
 package com.matyrobbrt.dynamicdata.api;
 
-import com.matyrobbrt.dynamicdata.impl.recipe.ReloadListenersImpl;
+import com.matyrobbrt.dynamicdata.impl.ReloadListenersImpl;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;

@@ -1,4 +1,4 @@
-package com.matyrobbrt.dynamicdata.impl.recipe;
+package com.matyrobbrt.dynamicdata.impl;
 
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimaps;

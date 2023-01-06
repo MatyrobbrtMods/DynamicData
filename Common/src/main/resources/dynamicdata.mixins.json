@@ -4,8 +4,13 @@
   "package": "com.matyrobbrt.dynamicdata.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "access.RecipeManagerAccess",
-    "SimplePreparableReloadListenerMixin"
+    "SimplePreparableReloadListenerMixin",
+
+    "TagLoaderMixin",
+    "TagManagerMixin",
+    "access.TagEntryAccess",
+
+    "RegistryDataLoaderMixin"
   ],
   "client": [
   ],

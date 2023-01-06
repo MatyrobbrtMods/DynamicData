@@ -1,6 +1,7 @@
 package com.matyrobbrt.dynamicdata;
 
 import com.matyrobbrt.dynamicdata.services.Platform;
+import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.ClassReader;
@@ -28,7 +29,7 @@ public class FabricPlatform implements Platform {
         try {
             visitAllClasses(new BaseClassVisitor() {
                 @Override
-                public AnnotationVisitor visitTypeAnnotation(int typeRef, TypePath typePath, String descriptor, boolean visible) {
+                public AnnotationVisitor visitAnnotation(String descriptor, boolean visible) {
                     if (descriptor.equals(desc)) {
                         return new AnnVisitor(data.computeIfAbsent(className, k -> new HashMap<>()));
                     }
@@ -69,6 +70,16 @@ public class FabricPlatform implements Platform {
         }
 
         return data;
+    }
+
+    @Override
+    public int getModCount() {
+        return FabricLoader.getInstance().getAllMods().size();
+    }
+
+    @Override
+    public boolean isClient() {
+        return FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT;
     }
 
     private void visitAllClasses(ClassVisitor visitor, AnnotationLookup lookup) throws IOException {
