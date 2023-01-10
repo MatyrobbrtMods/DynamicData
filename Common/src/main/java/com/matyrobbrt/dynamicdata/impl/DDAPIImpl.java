@@ -21,7 +21,7 @@ public class DDAPIImpl implements DynamicDataAPI {
     private final ListMultimap<Class<?>, Consumer<DataMutator>> mutatorConsumers = Multimaps.newListMultimap(new ConcurrentHashMap<>(), CopyOnWriteArrayList::new);
 
     @Override
-    public void addPlugin(DynamicDataPlugin plugin) {
+    public void registerPlugin(DynamicDataPlugin plugin) {
         plugins.add(plugin);
         plugin.collectMutatorListeners(new DynamicDataPlugin.MutatorCollector() {
             @Override

@@ -45,7 +45,7 @@ public class PluginCollector {
                     }).catching((cname, data, ex) -> LOG.error("Could not create exception of type " + cname + ": ", ex)));
             return plugins;
         }, service).thenAccept(plugins -> {
-            plugins.forEach(DynamicDataAPI.INSTANCE::addPlugin);
+            plugins.forEach(DynamicDataAPI.INSTANCE::registerPlugin);
             LOG.info("Found {} plugins.", plugins.size());
         });
 
