@@ -3,7 +3,7 @@ package com.matyrobbrt.dynamicdata.impl;
 import com.google.common.base.Suppliers;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimaps;
-import com.matyrobbrt.dynamicdata.api.DataMutator;
+import com.matyrobbrt.dynamicdata.api.mutation.DataMutator;
 import com.matyrobbrt.dynamicdata.api.DynamicDataAPI;
 import com.matyrobbrt.dynamicdata.api.plugin.DynamicDataPlugin;
 

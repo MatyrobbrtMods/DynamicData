@@ -1,4 +1,4 @@
-package com.matyrobbrt.dynamicdata.api;
+package com.matyrobbrt.dynamicdata.api.mutation;
 
 import com.google.gson.JsonElement;
 import net.minecraft.core.HolderLookup;

@@ -1,6 +1,6 @@
 package com.matyrobbrt.dynamicdata.impl;
 
-import com.matyrobbrt.dynamicdata.api.TagsMutator;
+import com.matyrobbrt.dynamicdata.api.mutation.TagsMutator;
 import com.matyrobbrt.dynamicdata.extensions.ExtendedTagLoader;
 import com.matyrobbrt.dynamicdata.mixin.access.TagEntryAccess;
 import com.mojang.logging.LogUtils;

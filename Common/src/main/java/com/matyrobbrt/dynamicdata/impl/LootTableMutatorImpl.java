@@ -4,10 +4,9 @@ import com.google.common.base.Suppliers;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.gson.JsonElement;
-import com.matyrobbrt.dynamicdata.api.LootTableMutator;
+import com.matyrobbrt.dynamicdata.api.mutation.LootTableMutator;
 import com.matyrobbrt.dynamicdata.api.ReloadListeners;
-import com.matyrobbrt.dynamicdata.util.ref.FieldHandle;
-import com.matyrobbrt.dynamicdata.util.ref.Reflection;
+import com.matyrobbrt.dynamicdata.mixin.access.LootTablesAccess;
 import com.mojang.logging.LogUtils;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -43,12 +42,12 @@ public record LootTableMutatorImpl(Supplier<Map<ResourceLocation, LootTable>> lo
     }
 
     private static final Logger LOG = LogUtils.getLogger();
-    private static final FieldHandle<LootTables, Map<ResourceLocation, LootTable>> TABLES_FIELD = Reflection.fieldHandle(LootTables.class, "tables", "f_79190_", "field_970");
     @RegisterRLL(stage = ReloadListeners.Stage.POST)
     private static void onLootTablesLoad(LootTables manager, ResourceManager resourceManager, ProfilerFiller profiler, Map<ResourceLocation, JsonElement> data) {
+        final LootTablesAccess access = (LootTablesAccess) manager;
         final AtomicReference<Map<ResourceLocation, LootTable>> maybeMutated = new AtomicReference<>();
         final LootTableMutatorImpl mutator = new LootTableMutatorImpl(Suppliers.memoize(() -> {
-            final Map<ResourceLocation, LootTable> copy = Maps.newHashMap(TABLES_FIELD.get(manager));
+            final Map<ResourceLocation, LootTable> copy = Maps.newHashMap(access.getTables());
             maybeMutated.setPlain(copy);
             return copy;
         }));
@@ -57,7 +56,7 @@ public record LootTableMutatorImpl(Supplier<Map<ResourceLocation, LootTable>> lo
 
         final Map<ResourceLocation, LootTable> mutated = maybeMutated.getPlain();
         if (mutated != null) {
-            TABLES_FIELD.set(manager, ImmutableMap.copyOf(mutated));
+            access.setTables(ImmutableMap.copyOf(mutated));
             LOG.info("Modified loot tables.");
         }
     }

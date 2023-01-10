@@ -1,8 +1,8 @@
 package com.matyrobbrt.dynamicdata.api.plugin;
 
-import com.matyrobbrt.dynamicdata.api.DataMutator;
-import com.matyrobbrt.dynamicdata.api.DatapackRegistryMutator;
-import com.matyrobbrt.dynamicdata.api.TagsMutator;
+import com.matyrobbrt.dynamicdata.api.mutation.DataMutator;
+import com.matyrobbrt.dynamicdata.api.mutation.DatapackRegistryMutator;
+import com.matyrobbrt.dynamicdata.api.mutation.TagsMutator;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 

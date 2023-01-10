@@ -1,11 +1,11 @@
 package com.matyrobbrt.dynamicdata;
 
-import com.matyrobbrt.dynamicdata.api.LootTableMutator;
-import com.matyrobbrt.dynamicdata.api.SplashMutator;
-import com.matyrobbrt.dynamicdata.api.advancement.AdvancementMutator;
 import com.matyrobbrt.dynamicdata.api.annotation.RegisterPlugin;
+import com.matyrobbrt.dynamicdata.api.mutation.AdvancementMutator;
+import com.matyrobbrt.dynamicdata.api.mutation.LootTableMutator;
+import com.matyrobbrt.dynamicdata.api.mutation.SplashMutator;
+import com.matyrobbrt.dynamicdata.api.mutation.recipe.RecipeMutator;
 import com.matyrobbrt.dynamicdata.api.plugin.DynamicDataPlugin;
-import com.matyrobbrt.dynamicdata.api.recipe.RecipeMutator;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementRewards;
 import net.minecraft.advancements.critereon.EntityPredicate;
@@ -14,6 +14,7 @@ import net.minecraft.advancements.critereon.ItemPredicate;
 import net.minecraft.advancements.critereon.MinMaxBounds;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.Items;
@@ -36,6 +37,23 @@ public class TestPlugin implements DynamicDataPlugin {
             mutator.removeAllWithResult(Items.ANDESITE);
 
             mutator.removeAllOfType(RecipeType.BLASTING);
+
+            mutator.getBuilders()
+                    .shapeless(RecipeCategory.MISC, Items.FURNACE)
+                    .requires(Items.PIG_SPAWN_EGG)
+                    .requires(Items.PUMPKIN_PIE)
+                    .save(mutator.getFinishedRecipeConsumer(), new ResourceLocation("furnace"));
+
+            mutator.getBuilders()
+                    .shapeless(RecipeCategory.MISC, Items.COD)
+                    .requires(Items.FISHING_ROD).requires(Items.ARROW)
+                    .unlockedBy("has_leaves", new InventoryChangeTrigger.TriggerInstance(
+                            EntityPredicate.Composite.ANY, MinMaxBounds.Ints.ANY,
+                            MinMaxBounds.Ints.ANY, MinMaxBounds.Ints.ANY,
+                            new ItemPredicate[]{ ItemPredicate.Builder.item().of(Items.ACACIA_LEAVES).build() }
+                    ))
+                    .save(mutator.getFinishedRecipeConsumer(), new ResourceLocation("mymod", "test_recipe"));
+
             mutator.replace(new ResourceLocation("crafting_table"), id -> new ShapelessRecipe(
                     id, "", CraftingBookCategory.MISC, Items.CRAFTING_TABLE.getDefaultInstance(),
                     NonNullList.of(Ingredient.EMPTY, Ingredient.of(Items.BIRCH_BOAT), Ingredient.of(Items.ACACIA_DOOR))

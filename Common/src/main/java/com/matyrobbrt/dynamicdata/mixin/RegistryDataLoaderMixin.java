@@ -1,16 +1,11 @@
 package com.matyrobbrt.dynamicdata.mixin;
 
 import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
 import com.matyrobbrt.dynamicdata.Constants;
-import com.matyrobbrt.dynamicdata.api.DatapackRegistryMutator;
 import com.matyrobbrt.dynamicdata.impl.DDAPIImpl;
 import com.matyrobbrt.dynamicdata.impl.DatapackRegistryMutatorImpl;
-import com.matyrobbrt.dynamicdata.impl.TagsMutatorImpl;
-import com.mojang.serialization.DataResult;
 import com.mojang.serialization.Decoder;
 import com.mojang.serialization.JsonOps;
-import com.mojang.serialization.Lifecycle;
 import net.minecraft.core.Registry;
 import net.minecraft.core.WritableRegistry;
 import net.minecraft.resources.RegistryDataLoader;

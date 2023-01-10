@@ -1,7 +1,7 @@
 package com.matyrobbrt.dynamicdata.impl;
 
 import com.google.gson.JsonElement;
-import com.matyrobbrt.dynamicdata.api.DatapackRegistryMutator;
+import com.matyrobbrt.dynamicdata.api.mutation.DatapackRegistryMutator;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Registry;
 import net.minecraft.core.WritableRegistry;

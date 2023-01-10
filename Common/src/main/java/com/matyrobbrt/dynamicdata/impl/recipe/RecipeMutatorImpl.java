@@ -6,12 +6,13 @@ import com.google.common.collect.Maps;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.matyrobbrt.dynamicdata.api.ReloadListeners;
-import com.matyrobbrt.dynamicdata.api.recipe.RecipeMutator;
+import com.matyrobbrt.dynamicdata.api.mutation.recipe.RecipeBuilders;
+import com.matyrobbrt.dynamicdata.api.mutation.recipe.RecipeMutator;
 import com.matyrobbrt.dynamicdata.impl.DDAPIImpl;
 import com.matyrobbrt.dynamicdata.impl.RegisterRLL;
-import com.matyrobbrt.dynamicdata.util.ref.FieldHandle;
-import com.matyrobbrt.dynamicdata.util.ref.Reflection;
+import com.matyrobbrt.dynamicdata.mixin.access.RecipeManagerAccess;
 import com.mojang.logging.LogUtils;
+import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.profiling.ProfilerFiller;
@@ -21,13 +22,15 @@ import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.item.crafting.RecipeType;
 import org.slf4j.Logger;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-public record RecipeMutatorImpl(Supplier<Map<ResourceLocation, Recipe<?>>> supplier) implements RecipeMutator {
+public record RecipeMutatorImpl(Supplier<Map<ResourceLocation, Recipe<?>>> supplier, RecipeBuilders builders) implements RecipeMutator {
 
     @Override
     public void add(Recipe<?> recipe) {
@@ -42,6 +45,22 @@ public record RecipeMutatorImpl(Supplier<Map<ResourceLocation, Recipe<?>>> suppl
     @Override
     public void add(ResourceLocation recipeId, JsonObject json) {
         this.add(RecipeManager.fromJson(recipeId, json));
+    }
+
+    @Override
+    public Consumer<FinishedRecipe> getFinishedRecipeConsumer() {
+        return recipe -> {
+            add(recipe.getId(), recipe.serializeRecipe());
+            final JsonObject advJson = recipe.serializeAdvancement();
+            if (advJson != null && advJson.get("criteria").getAsJsonObject().keySet().stream().anyMatch(it -> !it.equals("has_the_recipe"))) {
+                DATAGEN_RECIPE_ADVANCEMENTS.put(recipe.getAdvancementId(), advJson);
+            }
+        };
+    }
+
+    @Override
+    public RecipeBuilders getBuilders() {
+        return builders;
     }
 
     @Override
@@ -95,18 +114,17 @@ public record RecipeMutatorImpl(Supplier<Map<ResourceLocation, Recipe<?>>> suppl
         return supplier.get();
     }
 
-    private static final FieldHandle<RecipeManager, Map<RecipeType<?>, Map<ResourceLocation, Recipe<?>>>> RECIPES_FIELD = Reflection.fieldHandle(RecipeManager.class, "recipes", "f_44007_", "field_9023");
-    private static final FieldHandle<RecipeManager, Map<ResourceLocation, Recipe<?>>> BY_NAME_FIELD = Reflection.fieldHandle(RecipeManager.class, "byName", "f_199900_", "field_36308");
-
     private static final Logger LOG = LogUtils.getLogger();
+    public static final Map<ResourceLocation, JsonObject> DATAGEN_RECIPE_ADVANCEMENTS = new HashMap<>();
     @RegisterRLL(stage = ReloadListeners.Stage.POST)
     private static void onRecipesLoad(RecipeManager manager, ResourceManager resourceManager, ProfilerFiller profiler, Map<ResourceLocation, JsonElement> data) {
+        final RecipeManagerAccess mac = (RecipeManagerAccess) manager;
         final AtomicReference<Map<ResourceLocation, Recipe<?>>> maybeMutated = new AtomicReference<>();
         final RecipeMutatorImpl mutator = new RecipeMutatorImpl(Suppliers.memoize(() -> {
-            final Map<ResourceLocation, Recipe<?>> copy = Maps.newHashMap(BY_NAME_FIELD.get(manager));
+            final Map<ResourceLocation, Recipe<?>> copy = Maps.newHashMap(mac.getByName());
             maybeMutated.setPlain(copy);
             return copy;
-        }));
+        }), new RecipeBuildersImpl());
 
         DDAPIImpl.INSTANCE.get().fireMutation(mutator);
 
@@ -115,8 +133,8 @@ public record RecipeMutatorImpl(Supplier<Map<ResourceLocation, Recipe<?>>> suppl
             final Map<RecipeType<?>, ImmutableMap.Builder<ResourceLocation, Recipe<?>>> mutatedAll = Maps.newHashMap();
             mutated.forEach((resourceLocation, recipe) -> mutatedAll.computeIfAbsent(recipe.getType(), $ -> ImmutableMap.builder()).put(resourceLocation, recipe));
 
-            BY_NAME_FIELD.set(manager, ImmutableMap.copyOf(mutated));
-            RECIPES_FIELD.set(manager, mutatedAll.entrySet().stream().collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, entry -> entry.getValue().build())));
+            mac.setByName(ImmutableMap.copyOf(mutated));
+            mac.setRecipes(mutatedAll.entrySet().stream().collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, entry -> entry.getValue().build())));
             LOG.info("Modified recipes.");
         }
     }

@@ -10,7 +10,19 @@
     "TagManagerMixin",
     "access.TagEntryAccess",
 
-    "RegistryDataLoaderMixin"
+    "RegistryDataLoaderMixin",
+
+    "access.LootTablesAccess",
+    "access.RecipeManagerAccess",
+    "access.ServerAdvancementManagerAccess",
+    "access.SplashManagerAccess",
+
+    "recipe.MixinRecipeBuilder",
+    "recipe.ShapelessRecipe",
+    "recipe.ShapedRecipe",
+    "recipe.Cooking",
+    "recipe.SingleItem",
+    "recipe.UpgradeRecipe"
   ],
   "client": [
   ],

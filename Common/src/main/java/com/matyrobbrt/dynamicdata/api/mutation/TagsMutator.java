@@ -1,4 +1,4 @@
-package com.matyrobbrt.dynamicdata.api;
+package com.matyrobbrt.dynamicdata.api.mutation;
 
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;

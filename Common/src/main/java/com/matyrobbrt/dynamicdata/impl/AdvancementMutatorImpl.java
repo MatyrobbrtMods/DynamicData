@@ -1,25 +1,26 @@
-package com.matyrobbrt.dynamicdata.impl.advancement;
+package com.matyrobbrt.dynamicdata.impl;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.matyrobbrt.dynamicdata.api.ReloadListeners;
-import com.matyrobbrt.dynamicdata.api.advancement.AdvancementMutator;
-import com.matyrobbrt.dynamicdata.impl.DDAPIImpl;
-import com.matyrobbrt.dynamicdata.impl.RegisterRLL;
-import com.matyrobbrt.dynamicdata.util.ref.FieldHandle;
-import com.matyrobbrt.dynamicdata.util.ref.Reflection;
+import com.matyrobbrt.dynamicdata.api.mutation.AdvancementMutator;
+import com.matyrobbrt.dynamicdata.impl.recipe.RecipeMutatorImpl;
+import com.matyrobbrt.dynamicdata.mixin.access.ServerAdvancementManagerAccess;
 import com.mojang.logging.LogUtils;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementList;
+import net.minecraft.advancements.critereon.DeserializationContext;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.ServerAdvancementManager;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.world.level.storage.loot.PredicateManager;
 import org.slf4j.Logger;
 
 import java.util.Map;
 import java.util.Set;
 
-public record AdvancementMutatorImpl(AdvancementList list) implements AdvancementMutator {
+public record AdvancementMutatorImpl(AdvancementList list, PredicateManager predicateManager) implements AdvancementMutator {
     @Override
     public AdvancementList getAdvancements() {
         return list;
@@ -50,11 +51,21 @@ public record AdvancementMutatorImpl(AdvancementList list) implements Advancemen
         list.add(Map.of(id, builder));
     }
 
+    @Override
+    public void add(ResourceLocation id, JsonObject json) {
+        this.add(id, Advancement.Builder.fromJson(json, new DeserializationContext(id, predicateManager)));
+    }
+
     private static final Logger LOG = LogUtils.getLogger();
-    private static final FieldHandle<ServerAdvancementManager, AdvancementList> ADVANCEMENTS_FIELD = Reflection.fieldHandle(ServerAdvancementManager.class, "advancements", "f_139326_", "field_24452");
     @RegisterRLL(stage = ReloadListeners.Stage.POST)
     private static void onAdvancementLoad(ServerAdvancementManager manager, ResourceManager resourceManager, ProfilerFiller profiler, Map<ResourceLocation, JsonElement> data) {
-        DDAPIImpl.INSTANCE.get().fireMutation(new AdvancementMutatorImpl(ADVANCEMENTS_FIELD.get(manager)));
+        final ServerAdvancementManagerAccess access = (ServerAdvancementManagerAccess) manager;
+        final AdvancementMutatorImpl mutator = new AdvancementMutatorImpl(access.getAdvancements(), access.getPredicateManager());
+
+        DDAPIImpl.INSTANCE.get().fireMutation(mutator);
+        RecipeMutatorImpl.DATAGEN_RECIPE_ADVANCEMENTS.forEach(mutator::add);
+        RecipeMutatorImpl.DATAGEN_RECIPE_ADVANCEMENTS.clear();
+
         LOG.info("Modified advancements.");
     }
 }

@@ -1,9 +1,8 @@
 package com.matyrobbrt.dynamicdata.impl;
 
 import com.matyrobbrt.dynamicdata.api.ReloadListeners;
-import com.matyrobbrt.dynamicdata.api.SplashMutator;
-import com.matyrobbrt.dynamicdata.util.ref.FieldHandle;
-import com.matyrobbrt.dynamicdata.util.ref.Reflection;
+import com.matyrobbrt.dynamicdata.api.mutation.SplashMutator;
+import com.matyrobbrt.dynamicdata.mixin.access.SplashManagerAccess;
 import net.minecraft.client.resources.SplashManager;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.profiling.ProfilerFiller;
@@ -32,10 +31,9 @@ public record SplashMutatorImpl(List<String> splashes) implements SplashMutator 
         splashes.clear();
     }
 
-    private static final FieldHandle<SplashManager, List<String>> SPLASHES_FIELD = Reflection.fieldHandle(SplashManager.class, "splashes", "f_118862_", "field_17906");
     @RegisterRLL(stage = ReloadListeners.Stage.POST, clientOnly = true)
     static void onSplashesLoad(SplashManager manager, ResourceManager resourceManager, ProfilerFiller profiler, List<String> data) {
-        final List<String> splashes = SPLASHES_FIELD.get(manager);
+        final List<String> splashes = ((SplashManagerAccess)(manager)).getSplashes();
         DDAPIImpl.INSTANCE.get().fireMutation(new SplashMutatorImpl(splashes));
     }
 }

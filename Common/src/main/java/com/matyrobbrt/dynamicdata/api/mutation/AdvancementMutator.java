@@ -1,6 +1,6 @@
-package com.matyrobbrt.dynamicdata.api.advancement;
+package com.matyrobbrt.dynamicdata.api.mutation;
 
-import com.matyrobbrt.dynamicdata.api.DataMutator;
+import com.google.gson.JsonObject;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementList;
 import net.minecraft.resources.ResourceLocation;
@@ -16,4 +16,6 @@ public interface AdvancementMutator extends DataMutator {
 
     void add(Advancement advancement);
     void add(ResourceLocation id, Advancement.Builder builder);
+
+    void add(ResourceLocation id, JsonObject json);
 }
