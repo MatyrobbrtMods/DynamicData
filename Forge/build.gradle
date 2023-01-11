@@ -35,6 +35,10 @@ minecraft {
     }
 
     runs {
+        configureEach {
+            jvmArg('-Dcom.matyrobbrt.dynamicdata.isDynDataDev=true')
+        }
+
         client {
             workingDirectory project.file('run')
             ideaModule "${rootProject.name}.${project.name}.main"

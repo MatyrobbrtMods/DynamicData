@@ -28,6 +28,7 @@ loom {
             // Thanks Fabric...
             vmArgs("-Dfabric.classPathGroups=${classPaths.join(File.pathSeparator)}")
             vmArg('-Xmx3G')
+            vmArg('-Dcom.matyrobbrt.dynamicdata.isDynDataDev=true')
         }
         client {
             client()

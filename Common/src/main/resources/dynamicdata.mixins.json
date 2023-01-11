@@ -22,7 +22,8 @@
     "recipe.ShapedRecipe",
     "recipe.Cooking",
     "recipe.SingleItem",
-    "recipe.UpgradeRecipe"
+    "recipe.UpgradeRecipe",
+    "recipe.MixinRecipeManager"
   ],
   "client": [
   ],

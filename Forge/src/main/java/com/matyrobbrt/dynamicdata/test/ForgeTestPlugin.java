@@ -1,4 +1,4 @@
-package com.matyrobbrt.dynamicdata;
+package com.matyrobbrt.dynamicdata.test;
 
 import com.matyrobbrt.dynamicdata.api.annotation.RegisterPlugin;
 import com.matyrobbrt.dynamicdata.api.plugin.DynamicDataPlugin;
@@ -18,6 +18,8 @@ public class ForgeTestPlugin implements DynamicDataPlugin {
 
     @Override
     public void collectMutatorListeners(MutatorCollector collector) {
+        if (!Boolean.getBoolean("com.matyrobbrt.dynamicdata.isDynDataDev")) return;
+
         collector.acceptDatapackRegistryMutator(ForgeRegistries.Keys.BIOME_MODIFIERS, mutator -> {
             mutator.register(new ResourceLocation("test:test_modifier"), new ForgeBiomeModifiers.AddSpawnsBiomeModifier(
                     new AnyHolderSet<>(mutator.registryLookup(Registries.BIOME).orElseThrow()),

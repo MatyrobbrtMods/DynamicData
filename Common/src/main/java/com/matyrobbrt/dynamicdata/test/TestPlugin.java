@@ -1,9 +1,10 @@
-package com.matyrobbrt.dynamicdata;
+package com.matyrobbrt.dynamicdata.test;
 
 import com.matyrobbrt.dynamicdata.api.annotation.RegisterPlugin;
 import com.matyrobbrt.dynamicdata.api.mutation.AdvancementMutator;
 import com.matyrobbrt.dynamicdata.api.mutation.LootTableMutator;
 import com.matyrobbrt.dynamicdata.api.mutation.SplashMutator;
+import com.matyrobbrt.dynamicdata.api.mutation.recipe.AddRecipeMutator;
 import com.matyrobbrt.dynamicdata.api.mutation.recipe.RecipeMutator;
 import com.matyrobbrt.dynamicdata.api.plugin.DynamicDataPlugin;
 import net.minecraft.advancements.Advancement;
@@ -33,6 +34,8 @@ public class TestPlugin implements DynamicDataPlugin {
 
     @Override
     public void collectMutatorListeners(MutatorCollector collector) {
+        if (!Boolean.getBoolean("com.matyrobbrt.dynamicdata.isDynDataDev")) return;
+
         collector.accept(RecipeMutator.class, mutator -> {
             mutator.removeAllWithResult(Items.ANDESITE);
 
@@ -60,6 +63,15 @@ public class TestPlugin implements DynamicDataPlugin {
             ));
 
             mutator.remove(new ResourceLocation("diorite"));
+            System.out.println("Normal!");
+        });
+
+        collector.accept(AddRecipeMutator.class, mutator -> {
+            mutator.getBuilders().shapeless(RecipeCategory.BREWING, Items.BEACON)
+                    .requires(Items.BEE_SPAWN_EGG)
+                    .requires(Items.PUMPKIN)
+                    .save(mutator.getFinishedRecipeConsumer(), new ResourceLocation("custom:custom_builder"));
+            System.out.println("Add!");
         });
 
         collector.accept(AdvancementMutator.class, mutator -> {

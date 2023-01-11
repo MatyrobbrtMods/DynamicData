@@ -75,10 +75,10 @@ public record RecipeMutatorImpl(Supplier<Map<ResourceLocation, Recipe<?>>> suppl
 
     @Override
     @SuppressWarnings("unchecked")
-    public <T extends Recipe<?>> void removeOfTypeMatching(RecipeType<T> recipeType, Predicate<T> tester) {
+    public <T extends Recipe<?>> void removeOfTypeMatching(RecipeType<T> recipeType, Predicate<T> predicate) {
         this.removeMatching(recipe -> {
             if (recipe.getType() == recipeType) {
-                return tester.test((T) recipe);
+                return predicate.test((T) recipe);
             }
             return false;
         });
@@ -114,7 +114,7 @@ public record RecipeMutatorImpl(Supplier<Map<ResourceLocation, Recipe<?>>> suppl
         return supplier.get();
     }
 
-    private static final Logger LOG = LogUtils.getLogger();
+    public static final Logger LOG = LogUtils.getLogger();
     public static final Map<ResourceLocation, JsonObject> DATAGEN_RECIPE_ADVANCEMENTS = new HashMap<>();
     @RegisterRLL(stage = ReloadListeners.Stage.POST)
     private static void onRecipesLoad(RecipeManager manager, ResourceManager resourceManager, ProfilerFiller profiler, Map<ResourceLocation, JsonElement> data) {
