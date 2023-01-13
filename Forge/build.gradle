@@ -15,7 +15,7 @@ apply plugin: 'eclipse'
 apply plugin: 'org.spongepowered.mixin'
 apply plugin: 'maven-publish'
 
-archivesBaseName = "${mod_name}-forge-${minecraft_version}"
+archivesBaseName = "${mod_name}-${minecraft_version}-forge"
 
 mixin {
     add sourceSets.main, "${mod_id}.refmap.json"
@@ -115,15 +115,27 @@ jar.finalizedBy('reobfJar')
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            groupId project.group
-            artifactId project.archivesBaseName
-            version project.version
-            artifact jar
+            groupId = 'com.matyrobbrt.dynamicdata'
+            artifactId = "${mod_name}-${minecraft_version}-forge"
+            version = project.version
+
+            artifacts = [tasks.jar, sourcesJar]
+            pom.withXml { node ->
+                node.asNode().dependencies
+                        .'*'
+                        .findAll { it.artifactId.text().contains("${mod_name}-${minecraft_version}") }
+                        .each { it.parent().remove(it) }
+            }
         }
     }
     repositories {
         maven {
-            url "file://" + System.getenv("local_maven")
+            name = 'ModdingInquisitionMavenRepo'
+            url = 'https://maven.moddinginquisition.org/releases'
+            credentials {
+                username = findProperty('inquisitionMavenUser') ?: ''
+                password = findProperty('inquisitionMavenPassword') ?: ''
+            }
         }
     }
 }

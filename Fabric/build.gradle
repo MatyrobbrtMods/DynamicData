@@ -4,7 +4,7 @@ plugins {
     id 'idea'
 }
 
-archivesBaseName = "${mod_name}-fabric-${minecraft_version}"
+archivesBaseName = "${mod_name}-${minecraft_version}-fabric"
 
 dependencies {
     minecraft "com.mojang:minecraft:${minecraft_version}"
@@ -70,16 +70,27 @@ jar {
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            groupId project.group
-            artifactId project.archivesBaseName
-            version project.version
-            from components.java
+            groupId = 'com.matyrobbrt.dynamicdata'
+            artifactId = "${mod_name}-${minecraft_version}-fabric"
+            version = project.version
+
+            artifacts = [tasks.remapJar, sourcesJar]
+            pom.withXml { node ->
+                node.asNode().dependencies
+                        .'*'
+                        .findAll { it.artifactId.text().contains("${mod_name}-${minecraft_version}") }
+                        .each { it.parent().remove(it) }
+            }
         }
     }
-
     repositories {
         maven {
-            url "file://" + System.getenv("local_maven")
+            name = 'ModdingInquisitionMavenRepo'
+            url = 'https://maven.moddinginquisition.org/releases'
+            credentials {
+                username = findProperty('inquisitionMavenUser') ?: ''
+                password = findProperty('inquisitionMavenPassword') ?: ''
+            }
         }
     }
 }

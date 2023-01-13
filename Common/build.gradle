@@ -4,7 +4,7 @@ plugins {
     id 'maven-publish'
 }
 
-archivesBaseName = "${mod_name}-common-${minecraft_version}"
+archivesBaseName = "${mod_name}-${minecraft_version}-common"
 
 minecraft {
     version(minecraft_version)
@@ -34,19 +34,24 @@ processResources {
         expand buildProps
     }
 }
+
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            groupId project.group
-            artifactId project.archivesBaseName
-            version project.version
-            from components.java
+            groupId = 'com.matyrobbrt.dynamicdata'
+            artifactId = "${mod_name}-${minecraft_version}"
+            version = project.version
+            artifacts = [tasks.jar, sourcesJar]
         }
     }
-
     repositories {
         maven {
-            url "file://" + System.getenv("local_maven")
+            name = 'ModdingInquisitionMavenRepo'
+            url = 'https://maven.moddinginquisition.org/releases'
+            credentials {
+                username = findProperty('inquisitionMavenUser') ?: ''
+                password = findProperty('inquisitionMavenPassword') ?: ''
+            }
         }
     }
 }

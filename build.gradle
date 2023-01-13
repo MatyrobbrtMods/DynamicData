@@ -1,3 +1,5 @@
+group = 'com.matyrobbrt.dynamicdata'
+
 subprojects {
     
     apply plugin: 'java'
