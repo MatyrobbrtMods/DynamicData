@@ -46,11 +46,11 @@ publishing {
     }
     repositories {
         maven {
-            name = 'ModdingInquisitionMavenRepo'
-            url = 'https://maven.moddinginquisition.org/releases'
+            name = 'MatyrobbrtMaven'
+            url = 'https://maven.matyrobbrt.com/releases'
             credentials {
-                username = findProperty('inquisitionMavenUser') ?: ''
-                password = findProperty('inquisitionMavenPassword') ?: ''
+                username = findProperty('matyrobbrtMavenUser') ?: ''
+                password = findProperty('matyrobbrtMavenPassword') ?: ''
             }
         }
     }

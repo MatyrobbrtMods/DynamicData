@@ -100,6 +100,9 @@ dependencies {
 tasks.withType(JavaCompile) {
     source(project(":Common").sourceSets.main.allSource)
 }
+tasks.named('sourcesJar', Jar) {
+    from(project(":Common").sourceSets.main.allSource)
+}
 
 processResources {
     from project(":Common").sourceSets.main.resources
@@ -130,11 +133,11 @@ publishing {
     }
     repositories {
         maven {
-            name = 'ModdingInquisitionMavenRepo'
-            url = 'https://maven.moddinginquisition.org/releases'
+            name = 'MatyrobbrtMaven'
+            url = 'https://maven.matyrobbrt.com/releases'
             credentials {
-                username = findProperty('inquisitionMavenUser') ?: ''
-                password = findProperty('inquisitionMavenPassword') ?: ''
+                username = findProperty('matyrobbrtMavenUser') ?: ''
+                password = findProperty('matyrobbrtMavenPassword') ?: ''
             }
         }
     }
